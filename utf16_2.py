@@ -35,7 +35,7 @@ def calculate_total_stroke(utf16_char_count, input_str):
     return total_stroke, not_found_chars
 
 def main():
-    st.title("文字画数計算")
+    st.title("画数判定プログラム")
 
     # リポジトリに配置されたCSVファイルのパス
     csv_file_path = "code_stroke.csv"
@@ -46,14 +46,14 @@ def main():
         if os.path.exists(csv_file_path):
             utf16_char_count = load_utf16_char_count(csv_file_path)
 
-            input_str = st.text_input("文字列を入力してください")
+            input_str = st.text_area("画数を判定したい文字列を入力してください")
             if st.button("計算"):
                 if input_str:
                     total_stroke, not_found_chars = calculate_total_stroke(utf16_char_count, input_str)
                     st.write(f"入力した文字列の総画数は **{total_stroke}** です。")
                     if not_found_chars:
                         st.write("以下の文字の画数はデータにありません:")
-                        st.write(", ".join(not_found_chars))
+                        st.write("『" + ", ".join(not_found_chars) + "』")
         else:
             st.write("CSVファイルが見つかりません。")
 

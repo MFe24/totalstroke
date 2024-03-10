@@ -1,11 +1,10 @@
 import streamlit as st
 import csv
 import os
-from tempfile import NamedTemporaryFile
 
 def load_utf16_char_count(csv_file):
     utf16_char_count = {}
-    with open(csv_file.name, newline='', encoding='utf-8') as csvfile:
+    with open(csv_file, newline='', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
             utf16_code = row[0]  # 1列目にはUTF-16の文字コードが格納されていると仮定
@@ -38,26 +37,25 @@ def calculate_total_stroke(utf16_char_count, input_str):
 def main():
     st.title("文字画数計算")
 
+    # リポジトリに配置されたCSVファイルのパス
+    csv_file_path = "code_stroke.csv"
+
     # 中央のコンテンツ
     col1, col2 = st.columns([2, 1])
     with col1:
-        csv_file = st.file_uploader("CSVファイルをアップロードしてください", type=["csv"])
-        if csv_file is not None:
-            with NamedTemporaryFile(delete=False) as tmp_file:
-                tmp_file.write(csv_file.read())
-                tmp_file_path = tmp_file.name
-                utf16_char_count = load_utf16_char_count(tmp_file)
+        if os.path.exists(csv_file_path):
+            utf16_char_count = load_utf16_char_count(csv_file_path)
 
             input_str = st.text_input("文字列を入力してください")
             if st.button("計算"):
                 if input_str:
                     total_stroke, not_found_chars = calculate_total_stroke(utf16_char_count, input_str)
-                    st.write(f"入力した文字列の総画数は<strong>《{total_stroke}》</strong>です。", unsafe_allow_html=True)
+                    st.write(f"入力した文字列の総画数は **{total_stroke}** です。")
                     if not_found_chars:
                         st.write("以下の文字の画数はデータにありません:")
-                        st.write("『" + ", ".join(not_found_chars) + "』")
-
-            os.remove(tmp_file_path)
+                        st.write(", ".join(not_found_chars))
+        else:
+            st.write("CSVファイルが見つかりません。")
 
 if __name__ == "__main__":
     main()
